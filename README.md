@@ -1,4 +1,0 @@
-Scrape
-======
-
-Downloads the files
