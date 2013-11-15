@@ -4,17 +4,17 @@
  * @file scrape.php
  * Downloads the files specified from the server specified in the
  * $vars array
- * 
+ *
  * Use the following search string to find open servers
  * -inurl:htm -inurl:html -intitle:”ftp” intitle:”index of /” TERM EXT
  * eg
- * -inurl:htm -inurl:html -intitle:”ftp” intitle:”index of /” Breaking Bad mkv
- * -inurl:htm -inurl:html -intitle:”ftp” intitle:”index of /” Infected Mushrooms mp3
+ * -inurl:htm -inurl:html -intitle:”ftp” intitle:”index of /” animated gif
+ * -inurl:htm -inurl:html -intitle:”ftp” intitle:”index of /” ascii txt
  *
- * If you are on Windows OS you'll need WAMP or similar to set this up else 
+ * If you are on Windows OS you'll need WAMP or similar to set this up else
  * just LAMP or equivelant. You'll also need the CURL extension enabled.
- * 
- * To use just update the constants to match your config anf create the entries 
+ *
+ * To use just update the constants to match your config anf create the entries
  * you want to scrape in the $vars array and execute the script on the command line.
  */
 
@@ -22,19 +22,28 @@ set_time_limit(0);
 ini_set('memory_limit', '3000M');
 ini_set('open_basedir', FALSE);
 
-// destination & root folders
-define('DESTINATION_ROOT', 'C:/shares/Music/');
-define('ROOT_PATH',        'C:/wamp/www/');
+// Must be writable by webserver, root folder to save to
+define('DESTINATION_ROOT', '/path/to/destination/');
+
+// Must be writable by webserver, location where temporary files will be created
+define('CACHE_PATH',        '/path/to/cache-directory/');
 
 $test_mode = FALSE;
 
 $vars = array();
 $vars[] = array(
-    'scrape_url'  => 'http://theunshaven.rooms.cwal.net/Animated%20Gifs/',
-    'destination_sub_dir' => 'muteam.fm/',
+    'scrape_url'  => 'http://www.candoo.com/ulsternorrie/images/animated%20gifs/animated%20letters/',
+    'destination_sub_dir' => 'Images/',
     'mime_types_i_want' => array('gif', 'jpg', 'jpeg'),
 );
+$vars[] = array(
+    'scrape_url'  => 'http://candybox2.net/ascii/eqItems/',
+    'destination_sub_dir' => 'Text files/',
+    'mime_types_i_want' => array('txt'),
+);
 
+
+//
 // get the links from the server
 $links = scrape($vars);
 
@@ -77,7 +86,7 @@ if (!empty($links)) {
         $temp = curl_get(
           $links[$i]['link'],
           array(
-            'tmp'   => ROOT_PATH . $links[$i]['file_name'] . '.tmp',
+            'tmp'   => CACHE_PATH . $links[$i]['file_name'] . '.tmp',
             'range' => $links[$i]['file_size'] . '-' . $links[$i]['content-length'],
           )
         );
@@ -132,13 +141,13 @@ if (!empty($links)) {
 }
 
 /**
- * Downloads films, music and whatever else you tell it to
- * 
+ * Downloads files
+ *
  * @param array $vars
  *   a keyed array
  * @param array $log
  * @param array $links
- * 
+ *
  * @return array
  */
 function scrape($vars, $log = array(), $links = array()) {
@@ -237,7 +246,7 @@ function scrape($vars, $log = array(), $links = array()) {
       }
     }
   }
-  
+
   return $links;
 }
 
@@ -388,7 +397,7 @@ function curl_get($url, $opts = array()) {
 
 /**
  * Returns right n chars from input
- * 
+ *
  * @param string $str
  *   the string to cut
  * @param int $count
@@ -403,7 +412,7 @@ function right($str, $count) {
 
 /**
  * Returns left n chars from input
- * 
+ *
  * @param string $str
  *   the string to cut
  * @param int $count
