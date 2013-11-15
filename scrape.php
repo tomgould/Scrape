@@ -42,8 +42,6 @@ $vars[] = array(
     'mime_types_i_want' => array('txt'),
 );
 
-
-//
 // get the links from the server
 $links = scrape($vars);
 
