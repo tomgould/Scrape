@@ -4,7 +4,7 @@
  * @file
  * Demonstration of the sreaper class
  */
-include 'scraper.class.inc';
+include 'scraper.class.php';
 
 $scraper = new scraper();
 $scraper->addLocation(
