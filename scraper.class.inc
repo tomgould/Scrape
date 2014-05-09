@@ -2,8 +2,8 @@
 
 /**
  * @file scraper.class.php
- * Downloads the files specified from the server specified in the
- * $vars array
+ * Downloads the files specified from the server specifiedfrom web servers with
+ * directory browsing enabled
  *
  * Use the following search string to find open servers
  * -inurl:htm -inurl:html -intitle:”ftp” intitle:”index of /” TERM EXT
