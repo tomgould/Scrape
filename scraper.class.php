@@ -3,7 +3,7 @@
 /**
  * @file scraper.class.php
  * Downloads the files specified from the server specifiedfrom web servers with
- * directory browsing enabled
+ * directory indexing enabled
  *
  * Use the following search string to find open servers in Google
  * -inurl:htm -inurl:html -intitle:”ftp” intitle:”index of /” TERM EXT
