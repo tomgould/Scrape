@@ -21,10 +21,11 @@ class scraper {
 
   private $destinationRoot = '/tmp/scraper/';
   private $cachePath       = '/tmp/';
-  private $testMode        = FALSE;
+  private $mode            = FALSE;
   private $toScrape        = array();
   private $excludePath     = array();
   private $excludeFilename = array();
+  private $search          = array();
 
   /**
    * Sets the destination root
@@ -51,12 +52,12 @@ class scraper {
   }
 
   /**
-   * Sets the test mode
+   * Sets the mode
    *
    * @param bool $param
    */
-  public function setTestMode($param) {
-    $this->testMode = TRUE == $param;
+  public function setMode($param) {
+    $this->mode = $param;
   }
 
   /**
@@ -107,9 +108,17 @@ class scraper {
   }
 
   /**
-   * Gets the destination root
+   * Adds search terms to be matched against file paths
    *
-   * @param string $param
+   * @param mixed $param
+   */
+  public function search($param) {
+    $searchTerms  = $this->prepareSearchTerms($param);
+    $this->search = array_merge($this->search, $searchTerms);
+  }
+
+  /**
+   * Gets the destination root
    */
   public function getDestinationRoot() {
     return $this->destinationRoot;
@@ -117,26 +126,20 @@ class scraper {
 
   /**
    * Gets the cache path
-   *
-   * @param string $param
    */
   public function getCachePath() {
     return $this->cachePath;
   }
 
   /**
-   * Gets the test mode
-   *
-   * @param bool $param
+   * Gets the mode
    */
-  public function getTestMode() {
-    return $this->testMode;
+  public function getMode() {
+    return $this->mode;
   }
 
   /**
    * Gets locations to scrape
-   *
-   * @param bool $param
    */
   public function getLocations() {
     return $this->toScrape;
@@ -144,8 +147,6 @@ class scraper {
 
   /**
    * Gets the excluded paths array
-   *
-   * @param bool $param
    */
   public function getExcludedPaths() {
     return $this->excludePath;
@@ -153,11 +154,41 @@ class scraper {
 
   /**
    * Gets the excluded filename array
-   *
-   * @param bool $param
    */
   public function getExcludedFilenames() {
     return $this->excludeFilename;
+  }
+
+  /**
+   * Gets the search terms
+   */
+  public function getSearch() {
+    return $this->search;
+  }
+
+  /**
+   * Prepares the search term from the manual input
+   *
+   * @param mixed $param
+   *
+   * @return array
+   */
+  private function prepareSearchTerms($param) {
+    $return = array();
+    if (is_array($param)) {
+      foreach ($param as $value) {
+        $value                                 = strtolower($value);
+        $return[$value]                        = $value;
+        $return[str_replace(' ', '.', $value)] = str_replace(' ', '.', $value);
+      }
+    }
+    elseif (mb_strlen($param) > 0) {
+      $param                                 = strtolower($param);
+      $return[$param]                        = $param;
+      $return[str_replace(' ', '.', $param)] = str_replace(' ', '.', $param);
+    }
+
+    return $return;
   }
 
   /**
@@ -205,7 +236,7 @@ class scraper {
           $links[$i]['file_size'] = 0;
         }
 
-        if ($this->getTestMode() == FALSE) {
+        if ($this->getMode() === FALSE) {
           echo 'Downloading: ' . str_replace($this->getDestinationRoot(), '/', $links[$i]['save_path']) . "\n";
           while ($links[$i]['file_size'] < $links[$i]['content-length']) {
 
@@ -249,7 +280,7 @@ class scraper {
             }
           }
         }
-        else {
+        elseif ($this->getMode() === 'test') {
           echo 'Writing : ' . str_replace($this->getDestinationRoot(), '/', $links[$i]['save_path']) . "\n";
           try {
             $fp = fopen($links[$i]['save_path'] . '.txt', "a");
@@ -258,6 +289,9 @@ class scraper {
             throw new Exception('Couldn\'t open a file', 0, $e);
             continue;
           }
+        }
+        elseif ($this->getMode() === 'search') {
+          echo 'Found : ' . str_replace($this->getDestinationRoot(), '/', $links[$i]['save_path']) . "\n";
         }
       }
     }
@@ -278,9 +312,11 @@ class scraper {
       $log[] = $var['scrape_url'];
 
       // make sure the destination folder exists
-      if (!is_dir(urldecode($this->getDestinationRoot() . $var['destination_sub_dir']))) {
-        mkdir(urldecode($this->getDestinationRoot() . $var['destination_sub_dir']), 0775, TRUE);
-        echo 'Making: ' . $var['destination_sub_dir'] . "\n";
+      if ($this->getMode() != 'search') {
+        if (!is_dir(urldecode($this->getDestinationRoot() . $var['destination_sub_dir']))) {
+          mkdir(urldecode($this->getDestinationRoot() . $var['destination_sub_dir']), 0775, TRUE);
+          echo 'Making: ' . $var['destination_sub_dir'] . "\n";
+        }
       }
 
       // get the web page in question
@@ -379,10 +415,24 @@ class scraper {
             }
           }
 
-          foreach ($this->getExcludedFilenames() as $value) {
-            if (mb_strpos($file_name, $value) !== FALSE) {
-              $exclude = TRUE;
-              continue;
+          // Check exclusion on the file name parameter
+          if ($exclude === FALSE) {
+            foreach ($this->getExcludedFilenames() as $value) {
+              if (mb_strpos($file_name, $value) !== FALSE) {
+                $exclude = TRUE;
+                continue;
+              }
+            }
+          }
+
+          // Check inclusion based on search parameter
+          if ($exclude === FALSE && count($this->getSearch() > 0)) {
+            $exclude = TRUE;
+            foreach ($this->getSearch() as $value) {
+              if (mb_strpos(strtolower($file_name), $value) !== FALSE) {
+                $exclude = FALSE;
+                continue;
+              }
             }
           }
 
