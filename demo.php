@@ -8,13 +8,13 @@ include 'scraper.class.php';
 
 $scraper = new scraper();
 $scraper->addLocation(
-  'http://dl.best-music.us/Foreign/Arabic/', 'test-x', array('mp3')
+  'http://www.candoo.com/ulsternorrie/images/animated%20gifs/animated%20letters/', 'test', array('gif')
 );
 $scraper->setCachePath('/tmp');
 $scraper->setDestinationRoot('/tmp/Scraper-Demo');
 $scraper->excludeInPath('_vti_cnf');
 $scraper->excludeInFilename(array('WTE', 'button', 'hot', 'new', 'arrow', 'smile', 'norr'));
-$scraper->search('nancy');
-$scraper->setMode('test');
+$scraper->search('CLR');
+$scraper->setMode('search');
 
 $scraper->scrape();
