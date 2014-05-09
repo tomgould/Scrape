@@ -5,17 +5,17 @@
  * Downloads the files specified from the server specifiedfrom web servers with
  * directory browsing enabled
  *
- * Use the following search string to find open servers
+ * Use the following search string to find open servers in Google
  * -inurl:htm -inurl:html -intitle:”ftp” intitle:”index of /” TERM EXT
  * eg
  * -inurl:htm -inurl:html -intitle:”ftp” intitle:”index of /” animated gif
  * -inurl:htm -inurl:html -intitle:”ftp” intitle:”index of /” ascii txt
  *
  * If you are on Windows OS you'll need WAMP or similar to set this up else
- * just LAMP or equivelant. You'll also need the CURL extension enabled.
+ * just PHP. You'll also need the CURL extension enabled.
  *
- * To use just update the constants to match your config anf create the entries
- * you want to scrape in the $vars array and execute the script on the command line.
+ * To use see the demo.php file, just envoke an object of type scraper and
+ * use the methods provided to search, test or download as required.
  */
 class scraper {
 
