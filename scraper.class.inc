@@ -237,7 +237,12 @@ class scraper {
         }
 
         if ($this->getMode() === FALSE) {
+
+          // Makes sure the directory existis
+          $this->destinationDirectory($links[$i]['destination']);
+
           echo 'Downloading: ' . str_replace($this->getDestinationRoot(), '/', $links[$i]['save_path']) . "\n";
+
           while ($links[$i]['file_size'] < $links[$i]['content-length']) {
 
             // do the curl request
@@ -281,9 +286,14 @@ class scraper {
           }
         }
         elseif ($this->getMode() === 'test') {
-          echo 'Writing : ' . str_replace($this->getDestinationRoot(), '/', $links[$i]['save_path']) . "\n";
+
+          // Makes sure the directory existis
+          $this->destinationDirectory($links[$i]['destination']);
+
+          echo 'Writing empty file: ' . str_replace($this->getDestinationRoot(), '/', $links[$i]['save_path']) . "\n";
+
           try {
-            $fp = fopen($links[$i]['save_path'] . '.txt', "a");
+            $fp = fopen($links[$i]['save_path'], "a");
             fclose($fp);
           } catch (Exception $e) {
             throw new Exception('Couldn\'t open a file', 0, $e);
@@ -310,14 +320,6 @@ class scraper {
   private function getLinks($vars, $log = array(), $links = array()) {
     foreach ($vars as $var) {
       $log[] = $var['scrape_url'];
-
-      // make sure the destination folder exists
-      if ($this->getMode() != 'search') {
-        if (!is_dir(urldecode($this->getDestinationRoot() . $var['destination_sub_dir']))) {
-          mkdir(urldecode($this->getDestinationRoot() . $var['destination_sub_dir']), 0775, TRUE);
-          echo 'Making: ' . $var['destination_sub_dir'] . "\n";
-        }
-      }
 
       // get the web page in question
       $page = $this->curlGet($var['scrape_url']);
@@ -441,9 +443,10 @@ class scraper {
             // if not then download it and add it to the output array
             if (!file_exists($local_file_path . $file_name)) {
               $links[] = array(
-                'save_path' => $local_file_path . $file_name,
-                'link'      => $href,
-                'file_name' => $file_name,
+                'save_path'   => $local_file_path . $file_name,
+                'link'        => $href,
+                'file_name'   => $file_name,
+                'destination' => $local_file_path,
               );
             }
           }
@@ -452,6 +455,21 @@ class scraper {
     }
 
     return $links;
+  }
+
+  /**
+   * Makes a directory if required to save the files in
+   *
+   * @param string $param
+   */
+  private function destinationDirectory($destination) {
+    // make sure the destination folder exists
+    if ($this->getMode() != 'search') {
+      if (!is_dir($destination)) {
+        mkdir($destination, 0775, TRUE);
+        echo 'Making: ' . $destination . "\n";
+      }
+    }
   }
 
   /**
