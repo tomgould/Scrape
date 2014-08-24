@@ -341,7 +341,7 @@ class scraper {
 
         // if this is a link from the root
         if ($this->left($href, 1) == '/') {
-          $href = $this->left($host, (strlen($host) - 1)) . $href;
+          $href = $host . $href;
         }
         else {
           $href = str_replace($var['scrape_url'], '', $href);
