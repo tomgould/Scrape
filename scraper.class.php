@@ -2,8 +2,8 @@
 
 /**
  * @file scraper.class.php
- * Downloads the files specified from the server specifiedfrom web servers with
- * directory indexing enabled
+ * Downloads the files specified from the location specified from web servers
+ * with directory indexing enabled
  *
  * Use the following search string to find open servers in Google
  * -inurl:htm -inurl:html -intitle:”ftp” intitle:”index of /” TERM EXT
@@ -21,14 +21,15 @@ class scraper {
 
   private $destinationRoot = '/tmp/scraper/';
   private $cachePath       = '/tmp/';
-  private $mode            = FALSE;
+  private $mode            = 'download';
   private $toScrape        = array();
   private $excludePath     = array();
   private $excludeFilename = array();
   private $search          = array();
 
   /**
-   * Sets the destination root
+   * Sets the destination root, the location where the downloaded files will
+   * be stored
    *
    * @param string $param
    */
@@ -37,10 +38,12 @@ class scraper {
     if ($this->right($this->destinationRoot, 1) !== '/') {
       $this->destinationRoot .= '/';
     }
+
+    return $this;
   }
 
   /**
-   * Sets the cache path
+   * Sets the cache path, the location for temporary files to be written
    *
    * @param string $param
    */
@@ -49,23 +52,37 @@ class scraper {
     if ($this->right($this->cachePath, 1) !== '/') {
       $this->cachePath .= '/';
     }
+
+    return $this;
   }
 
   /**
-   * Sets the mode
+   * Sets the mode the scraper works in
+   * options are:
+   *   test, this creates the directories and writes empty files in place of
+   *         the downloads
+   *   search, this searches the locations and returns any matching results
+   *           without writing or downloading any files
+   *   download, downloads the files and writes them to disk
    *
-   * @param bool $param
+   * @param string $param
    */
   public function setMode($param) {
     $this->mode = $param;
+
+    return $this;
   }
 
   /**
    * Adds a location to the toScrape array
    *
    * @param string $url
+   *   The URL of the location to scrape
    * @param string $location
+   *   A subdirectory for all items form this server to be stored
    * @param array $mimeTypes
+   *   An array of file types to download if found
+   *   Leave empty to grab every file regardless of type.
    */
   public function addLocation($url, $location = NULL, $mimeTypes = array()) {
     if (NULL !== $location && $this->right($location, 1) !== '/') {
@@ -77,6 +94,8 @@ class scraper {
       'destination_sub_dir' => $location,
       'mime_types_i_want'   => $mimeTypes,
     );
+
+    return $this;
   }
 
   /**
@@ -91,6 +110,8 @@ class scraper {
     elseif (mb_strlen($param) > 0) {
       $this->excludePath[] = $param;
     }
+
+    return $this;
   }
 
   /**
@@ -105,16 +126,21 @@ class scraper {
     elseif (mb_strlen($param) > 0) {
       $this->excludeFilename[] = $param;
     }
+
+    return $this;
   }
 
   /**
    * Adds search terms to be matched against file paths
+   * Add as many terms as you like, this is case insensitive
    *
    * @param mixed $param
    */
   public function search($param) {
     $searchTerms  = $this->prepareSearchTerms($param);
     $this->search = array_merge($this->search, $searchTerms);
+
+    return $this;
   }
 
   /**
@@ -236,7 +262,7 @@ class scraper {
           $links[$i]['file_size'] = 0;
         }
 
-        if ($this->getMode() === FALSE) {
+        if ($this->getMode() === 'download') {
 
           // Makes sure the directory existis
           $this->destinationDirectory($links[$i]['destination']);
@@ -301,7 +327,8 @@ class scraper {
           }
         }
         elseif ($this->getMode() === 'search') {
-          echo 'Found : ' . str_replace($this->getDestinationRoot(), '/', $links[$i]['save_path']) . "\n";
+          echo 'Found : ' . str_replace($this->getDestinationRoot(), '/', $links[$i]['save_path'])
+          . "\n" . "File Location: " . $links[$i]['link'] . "\n";
         }
       }
     }
@@ -427,7 +454,7 @@ class scraper {
             }
           }
 
-          // Check inclusion based on search parameter
+          // Check inclusion based on search parameters
           if ($exclude === FALSE && count($this->getSearch() > 0)) {
             $exclude = TRUE;
             foreach ($this->getSearch() as $value) {
@@ -490,7 +517,7 @@ class scraper {
   /**
    * The cURL wrapper
    *
-   * @param $url
+   * @param $urll
    *   The URL to get
    *
    * @param array $opts
