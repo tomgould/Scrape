@@ -455,7 +455,7 @@ class scraper {
           }
 
           // Check inclusion based on search parameters
-          if ($exclude === FALSE && count($this->getSearch() > 0)) {
+          if ($exclude === FALSE && count($this->getSearch()) > 0) {
             $exclude = TRUE;
             foreach ($this->getSearch() as $value) {
               if (mb_strpos(strtolower($file_name), $value) !== FALSE) {
@@ -463,6 +463,11 @@ class scraper {
                 continue;
               }
             }
+          }
+
+          // Dont try to download a folder
+          if (empty($file_name)) {
+            $exclude = TRUE;
           }
 
           // If exclude is still false then go on and add this to the list
@@ -591,7 +596,7 @@ class scraper {
       $time_out = $opts['time_out'];
     }
     else {
-      $time_out = 10;
+      $time_out = 60;
     }
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $time_out);
 
@@ -613,7 +618,7 @@ class scraper {
       $low_speed_time = $opts['low_speed_time'];
     }
     else {
-      $low_speed_time = 10;
+      $low_speed_time = 60;
     }
     curl_setopt($ch, CURLOPT_LOW_SPEED_TIME, $low_speed_time);
 
