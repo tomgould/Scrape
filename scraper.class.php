@@ -19,13 +19,14 @@
  */
 class scraper {
 
-  private $destinationRoot = '/tmp/scraper/';
-  private $cachePath       = '/tmp/';
-  private $mode            = 'download';
-  private $toScrape        = array();
-  private $excludePath     = array();
-  private $excludeFilename = array();
-  private $search          = array();
+  private $destinationRoot   = '/tmp/scraper/';
+  private $cachePath         = '/tmp/';
+  private $mode              = 'download';
+  private $toScrape          = array();
+  private $excludePath       = array();
+  private $excludeFilename   = array();
+  private $search            = array();
+  private $FileNameProcessor = NULL;
 
   /**
    * Sets the destination root, the location where the downloaded files will
@@ -69,6 +70,18 @@ class scraper {
    */
   public function setMode($param) {
     $this->mode = $param;
+
+    return $this;
+  }
+
+  /**
+   * Sets an optional file name processor to be called after the file name
+   * has been determined from the HTML
+   *
+   * @param string $param
+   */
+  public function setFileNameProcessor($param) {
+    $this->FileNameProcessor = $param;
 
     return $this;
   }
@@ -190,6 +203,16 @@ class scraper {
    */
   public function getSearch() {
     return $this->search;
+  }
+
+  /**
+   * An optional file name processor to be called after the file name
+   * has been determined from the HTML
+   *
+   * @param string $param
+   */
+  public function getFileNameProcessor() {
+    return $this->FileNameProcessor;
   }
 
   /**
@@ -434,6 +457,12 @@ class scraper {
           // test if we already have the file
           $local_file_path = urldecode($this->getDestinationRoot() . $var['destination_sub_dir']);
           $file_name       = trim($this->sanitize(urldecode(end($pieces))));
+
+          // If there is a file name processor call it
+          if ($this->getFileNameProcessor() !== NULL && is_callable($this->getFileNameProcessor())) {
+            $file_name = call_user_func($this->getFileNameProcessor(), $file_name);
+          }
+
 
           // check if it should be excluded and do nothing if it should
           $exclude = FALSE;
