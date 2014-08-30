@@ -34,4 +34,7 @@ function remove_date_string($name) {
   if (is_numeric(mb_substr($name, 0, 14))) {
     return mb_substr($name, ((strlen($name) - 15) * -1));
   }
+  else {
+    return 'Name Changed ' . $name;
+  }
 }
