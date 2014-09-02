@@ -279,13 +279,13 @@ class scraper {
 
     // If there is a limit to the number of files to get
     if ($this->getRandomLimit() > 0) {
-      for ($i=0;$i < 10; $i++) {
-          $links[$i] = array('gash' => array(0 => 98986, 1 => 879879));
-      }
-      $indexes = array_rand($links, 5);
+      $random_links = array();
+      $indexes = array_rand($links, $this->getRandomLimit());
+      
       foreach ($indexes as $key) {
-          $random_links[] = $links[$key];     
+        $random_links[] = $links[$key];     
       }
+      
       $links = $random_links;
     }
     
