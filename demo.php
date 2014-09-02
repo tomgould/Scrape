@@ -17,6 +17,7 @@ $scraper->addLocation('http://www.candoo.com/ulsternorrie/images/animated%20gifs
   ->search('CLR')
   ->setMode('search')
   ->setFileNameProcessor('remove_date_string')
+  ->setRandomLimit(10)
   ->scrape();
 
 /**

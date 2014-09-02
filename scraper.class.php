@@ -27,6 +27,7 @@ class scraper {
   private $excludeFilename   = array();
   private $search            = array();
   private $FileNameProcessor = NULL;
+  private $RandomLimit       = 0;
 
   /**
    * Sets the destination root, the location where the downloaded files will
@@ -83,6 +84,18 @@ class scraper {
   public function setFileNameProcessor($param) {
     $this->FileNameProcessor = $param;
 
+    return $this;
+  }
+  
+  /**
+   * if greater than 0 this restricts the files downloaded to a number
+   * randomly selected form the range
+   *
+   * @return int $param
+   */
+  public function setRandomLimit($param) {
+    $this->RandomLimit = $param;
+    
     return $this;
   }
 
@@ -216,6 +229,16 @@ class scraper {
   }
 
   /**
+   * if greater than 0 this restricts the files downloaded to a number
+   * randomly selected form the range
+   *
+   * @return int $param
+   */
+  public function getRandomLimit() {
+    return $this->RandomLimit;
+  }
+  
+  /**
    * Prepares the search term from the manual input
    *
    * @param mixed $param
@@ -254,6 +277,18 @@ class scraper {
     // get the links from the server
     $links = $this->getLinks($this->getLocations());
 
+    // If there is a limit to the number of files to get
+    if ($this->getRandomLimit() > 0) {
+      for ($i=0;$i < 10; $i++) {
+          $links[$i] = array('gash' => array(0 => 98986, 1 => 879879));
+      }
+      $indexes = array_rand($links, 5);
+      foreach ($indexes as $key) {
+          $random_links[] = $links[$key];     
+      }
+      $links = $random_links;
+    }
+    
     if (!empty($links)) {
       for ($i = 0; $i < count($links); $i++) {
 
