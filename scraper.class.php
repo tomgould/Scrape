@@ -88,8 +88,8 @@ class scraper {
   }
   
   /**
-   * if greater than 0 this restricts the files downloaded to a number
-   * randomly selected form the range
+   * Allows you to download a random selection of the files, this limit is the
+   * total number of files to get.
    *
    * @return int $param
    */
@@ -229,8 +229,8 @@ class scraper {
   }
 
   /**
-   * if greater than 0 this restricts the files downloaded to a number
-   * randomly selected form the range
+   * Returns the random limit variable used if only a subsection of files
+   * should be downloaded
    *
    * @return int $param
    */
