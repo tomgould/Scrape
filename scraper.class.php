@@ -619,8 +619,8 @@ class scraper {
     else {
       $cookie = tempnam(sys_get_temp_dir(), "cookie");
     }
-    curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie);
-    curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie);
+    //curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie);
+    //curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie);
 
     // the headers
     if (!empty($opts['headers']) && is_array($opts['headers'])) {
