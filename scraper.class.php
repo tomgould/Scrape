@@ -355,7 +355,7 @@ class scraper
 
                 // add the content length to the link array
                 $file_header = array_change_key_case($file_header, CASE_LOWER);
-                $links[$i]['content-length'] = $file_header['content-length'];
+                $links[$i]['content-length'] = $file_header['content-length'] ?? 0;
 
                 // does the file already exist?
                 // if it does then get it's length
